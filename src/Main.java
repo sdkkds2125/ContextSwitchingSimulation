@@ -15,14 +15,14 @@ public class Main {
     public static void main(String[] args) {
         processor.setCurrInstruction(1);
         for (int i = 0; i < numOfProcesses; i++) {
-            SimProcess process = new SimProcess(i + 1, "Proc" + (i + 1), (200 + (i * 10)));
+            SimProcess process = new SimProcess(i + 1, "Proc" + (i + 1), (175 + (i * 10)));
             ProcessControlBlock pcb = new ProcessControlBlock(process);
             pcb.setCurrentInstruction(1);
             readyList.add(pcb);
         }
         //set up the first process to be executed
         runningPCB = readyList.remove(0);
-        for (int i = 0; i < totalNumOfIterations; i++) {
+        while (currentStep < totalNumOfIterations) {
             currentStep++;
             processor.setCurrentProcess(runningPCB.getProcess());
             System.out.print("Step " + currentStep + " ");
@@ -31,7 +31,7 @@ public class Main {
 
             if (result == ProcessState.READY) {
                 numOfCyclesThisProcessHasRunConsecutively++;
-                //Check if quantum was reached and if it was perform a context switch
+                //Check if quantum was reached and if it was it performs a context switch
                 if (numOfCyclesThisProcessHasRunConsecutively >= QUANTUM) {
                     System.out.println("*** Quantum expired ***");
                     numOfCyclesThisProcessHasRunConsecutively = 0;
