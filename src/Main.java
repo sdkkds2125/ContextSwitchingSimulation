@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
         processor.setCurrInstruction(1);
         for (int i = 0; i < numOfProcesses; i++) {
-            SimProcess process = new SimProcess(i + 1, "Proc" + (i + 1), (175 + (i * 10)));
+            SimProcess process = new SimProcess(i + 1, "Proc" + (i + 1), (100 + (i * 10)));
             ProcessControlBlock pcb = new ProcessControlBlock(process);
             pcb.setCurrentInstruction(1);
             readyList.add(pcb);
@@ -49,31 +49,36 @@ public class Main {
                 //now switching process so reset quantum "clock"
                 numOfCyclesThisProcessHasRunConsecutively = 0;
                 checkReadyListSizeAndRepopulateItIfNeeded();
-                runningPCB = readyList.remove(0);
-                reloadData();
+                if (!readyList.isEmpty()) {
+                    runningPCB = readyList.remove(0);
+                    reloadData();
+                }
             }
 
             if (result == ProcessState.FINISHED) {
                 numFinishedProcesses++;
                 System.out.println("*** Process Finished ***");
-                if (numFinishedProcesses >= numOfProcesses) {
-                    System.out.println("*** All processes are finished ***");
-                    break;
-                }
+//                if (numFinishedProcesses >= numOfProcesses) {
+//                    System.out.println("*** All processes are finished ***");
+//                    break;
+//                }
                 checkReadyListSizeAndRepopulateItIfNeeded();
-                runningPCB = readyList.remove(0);
-                reloadData();
+                if (!readyList.isEmpty()) {
+                    runningPCB = readyList.remove(0);
+                    reloadData();
+                }
             }
             wakeUpBlockedProcesses();
         }
+        System.out.println("The Processor has run all " + totalNumOfIterations + " iterations");
     }
 
     private static void checkReadyListSizeAndRepopulateItIfNeeded() {
-        if (readyList.isEmpty()) {
+        while (readyList.isEmpty() && currentStep < totalNumOfIterations) {
+            currentStep++;
+            System.out.print("Step " + currentStep + " ");
             System.out.println("Processor is idling. Waiting for processes to be unblocked");
-            while (readyList.isEmpty()) {
-                wakeUpBlockedProcesses();
-            }
+            wakeUpBlockedProcesses();
         }
     }
 
